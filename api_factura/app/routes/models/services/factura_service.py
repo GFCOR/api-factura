@@ -1,4 +1,4 @@
-from app.services.db import get_database
+from .db import get_database
 from bson import ObjectId
 
 db = get_database()

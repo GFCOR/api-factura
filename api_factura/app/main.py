@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.routes import factura
-from app.services.db import get_database
+from .routes.models.services.db import get_database
 
 app = FastAPI()
 
