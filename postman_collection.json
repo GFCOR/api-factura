@@ -1,0 +1,125 @@
+{
+    "info": {
+        "name": "API Factura",
+        "description": "Colección para probar los endpoints de la API Factura",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Home",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:8002/",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "8002",
+                    "path": [""]
+                }
+            }
+        },
+        {
+            "name": "Listar Facturas",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:8002/factura/",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "8002",
+                    "path": ["factura", ""]
+                }
+            }
+        },
+        {
+            "name": "Crear Factura",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"usuario_id\": 12345,\n  \"productos\": [\n    {\"id\": 1, \"cantidad\": 2},\n    {\"id\": 2, \"cantidad\": 1}\n  ],\n  \"fecha\": \"2025-05-03T10:00:00\"\n}"
+                },
+                "url": {
+                    "raw": "http://localhost:8002/factura/",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "8002",
+                    "path": ["factura", ""]
+                }
+            }
+        },
+        {
+            "name": "Obtener Factura por ID",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:8002/factura/{factura_id}",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "8002",
+                    "path": ["factura", "{factura_id}"],
+                    "variable": [
+                        {
+                            "key": "factura_id",
+                            "value": "64b8c3f2e89b4b001f2e6a7b"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Modificar Factura",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"usuario_id\": 12345,\n  \"productos\": [\n    {\"id\": 1, \"cantidad\": 3},\n    {\"id\": 2, \"cantidad\": 2}\n  ],\n  \"fecha\": \"2025-05-03T12:00:00\"\n}"
+                },
+                "url": {
+                    "raw": "http://localhost:8002/factura/{factura_id}",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "8002",
+                    "path": ["factura", "{factura_id}"],
+                    "variable": [
+                        {
+                            "key": "factura_id",
+                            "value": "64b8c3f2e89b4b001f2e6a7b"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Eliminar Factura",
+            "request": {
+                "method": "DELETE",
+                "url": {
+                    "raw": "http://localhost:8002/factura/{factura_id}",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "8002",
+                    "path": ["factura", "{factura_id}"],
+                    "variable": [
+                        {
+                            "key": "factura_id",
+                            "value": "64b8c3f2e89b4b001f2e6a7b"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

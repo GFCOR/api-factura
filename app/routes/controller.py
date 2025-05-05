@@ -1,52 +1,43 @@
 from fastapi import APIRouter, HTTPException
 from .models.services.utils.validation import Compra
-import httpx
-from api_factura.app.routes.models.services.factura_service import (
+from .models.services.factura_service import (
     crear_factura,
     obtener_facturas,
     obtener_factura_por_id,
     actualizar_factura,
     eliminar_factura,
+    obtener_datos_usuario,
+    obtener_datos_producto,
 )
 
 router = APIRouter(tags=["factura"])
 
-# URLs de las APIs externas
-API_USUARIOS_URL = "http://api-usuarios.com/users/users/{user_id}"
-API_PRODUCTOS_URL = "http://api-productos.com/productos/{id}"
-
 @router.post("/")
 def crear_nueva_factura(compra: Compra):
     # Obtener datos del usuario
-    try:
-        with httpx.Client() as client:
-            usuario_response = client.get(API_USUARIOS_URL.format(user_id=compra.usuario_id))
-            if usuario_response.status_code != 200:
-                raise HTTPException(status_code=usuario_response.status_code, detail="Error al obtener datos del usuario")
-            datos_usuario = usuario_response.json()
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al consultar la API de usuarios: {str(e)}")
+    datos_usuario = obtener_datos_usuario(compra.usuario_id)
+    if "error" in datos_usuario:
+        raise HTTPException(status_code=500, detail=datos_usuario["error"])
 
-    # Obtener datos de los productos
+    # Obtener datos de los productos y calcular subtotales
     productos_detalles = []
     for producto in compra.productos:
-        try:
-            with httpx.Client() as client:
-                producto_response = client.get(API_PRODUCTOS_URL.format(id=producto["id"]))
-                if producto_response.status_code != 200:
-                    raise HTTPException(status_code=producto_response.status_code, detail=f"Error al obtener datos del producto con ID {producto['id']}")
-                producto_detalle = producto_response.json()
-                productos_detalles.append({
-                    "id_producto": producto_detalle["id_producto"],
-                    "descripcion": producto_detalle["descripcion"],
-                    "precio": producto_detalle["precio"],
-                    "cantidad": producto["cantidad"],  # Cantidad enviada por el cliente
-                    "subtotal": producto_detalle["precio"] * producto["cantidad"]
-                })
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Error al consultar la API de productos: {str(e)}")
+        producto_detalle = obtener_datos_producto(producto["id"])
+        if "error" in producto_detalle:
+            raise HTTPException(status_code=500, detail=producto_detalle["error"])
 
-    # Calcular el total de la factura
+        # Calcular subtotal para el producto
+        subtotal = producto_detalle["precio"] * producto["cantidad"]
+        productos_detalles.append({
+            "id_producto": producto_detalle["id_producto"],
+            "nombre": producto_detalle["nombre"],
+            "descripcion": producto_detalle["descripcion"],
+            "precio_unitario": producto_detalle["precio"],
+            "cantidad": producto["cantidad"],
+            "subtotal": subtotal
+        })
+
+    # Calcular el total general de la factura
     total = sum(item["subtotal"] for item in productos_detalles)
 
     # Crear la factura final

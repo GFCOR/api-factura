@@ -1,0 +1,38 @@
+version: "3"
+services:
+  api-factura:
+    build: .
+    ports:
+      - "8002:8002"
+    restart: always
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URI: "mongodb://GFCOR:laManuelaEnFinLaManuela4ever@mongodb:27017/facturacion?authSource=admin"
+    networks:
+      - internal_network
+
+  mongodb:
+    image: mongo
+    container_name: mongo-db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: GFCOR
+      MONGO_INITDB_ROOT_PASSWORD: laManuelaEnFinLaManuela4ever
+    restart: always
+    networks:
+      - internal_network
+    
+
+volumes:
+  mongo_data:
+
+
+#Los otros contenedores de la api dependen de ejecutar: docker network create --driver bridge internal_network
+networks:
+  internal_network:
+    external: true
