@@ -1,6 +1,7 @@
 from .db import get_database
 from bson import ObjectId
 import httpx
+from bson.errors import InvalidId
 
 db = get_database()
 facturas_collection = db["facturas_collection"]
@@ -38,6 +39,8 @@ def crear_factura(factura_data):
 def obtener_facturas(skip=0, limit=10):
     try:
         facturas = list(facturas_collection.find().skip(skip).limit(limit))
+        print(f"Facturas encontradas: {len(facturas)}")  # <-- Agrega esto
+        print(f"Facturas crudas: {facturas}")
         for factura in facturas:
             factura["_id"] = str(factura["_id"])
         return facturas
@@ -46,10 +49,16 @@ def obtener_facturas(skip=0, limit=10):
 
 def obtener_factura_por_id(factura_id):
     try:
-        factura = facturas_collection.find_one({"_id": ObjectId(factura_id)})
+        try:
+            obj_id = ObjectId(factura_id)
+        except InvalidId:
+            return {"error": "ID de factura no válido"}
+        factura = facturas_collection.find_one({"_id": obj_id})
         if factura:
             factura["_id"] = str(factura["_id"])
-        return factura or {"error": "Factura no encontrada"}
+            return factura
+        else:
+            return {"error": "Factura no encontrada"}
     except Exception as e:
         return {"error": f"Error al buscar la factura: {str(e)}"}
 
