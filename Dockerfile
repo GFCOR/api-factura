@@ -7,11 +7,11 @@ WORKDIR /app
 # Copiar solo los archivos necesarios para instalar dependencias
 COPY requirements.txt .
 
-# Instalar las dependencias necesarias
+# Instalar las dependencias necesarias (esto se cachea si requirements.txt no cambia)
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Instalar curl
-RUN apt-get update && apt-get install -y curl && apt-get clean
+# Instalar curl y limpiar cache de apt
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 # Copiar el resto de los archivos al contenedor
 COPY . .
