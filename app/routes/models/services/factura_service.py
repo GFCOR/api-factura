@@ -35,9 +35,9 @@ def crear_factura(factura_data):
     except Exception as e:
         return {"error": f"No se pudo crear la factura: {str(e)}"}
 
-def obtener_facturas():
+def obtener_facturas(skip=0, limit=10):
     try:
-        facturas = list(facturas_collection.find())
+        facturas = list(facturas_collection.find().skip(skip).limit(limit))
         for factura in facturas:
             factura["_id"] = str(factura["_id"])
         return facturas

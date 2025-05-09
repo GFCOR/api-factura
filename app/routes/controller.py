@@ -57,8 +57,8 @@ def crear_nueva_factura(compra: Compra):
     return {"message": "Factura creada exitosamente", "id": factura_id}
 
 @router.get("/")
-def listar_facturas():
-    facturas = obtener_facturas()
+def listar_facturas(skip: int = 0, limit: int = 10):
+    facturas = obtener_facturas(skip=skip, limit=limit)
     if "error" in facturas:
         raise HTTPException(status_code=500, detail=facturas["error"])
     return facturas
