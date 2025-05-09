@@ -3,7 +3,7 @@ from bson import ObjectId
 import httpx
 
 db = get_database()
-facturas_collection = db["facturas"]
+facturas_collection = db["collection"]
 
 API_USUARIOS_URL = "http://api-usuarios:8000/users/{user_id}"
 API_PRODUCTOS_URL = "http://api-productos:8001/productos/{id}"
