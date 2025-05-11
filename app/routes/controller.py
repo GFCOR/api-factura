@@ -67,10 +67,10 @@ def crear_nueva_factura(compra: Compra, request: Request):
         raise HTTPException(status_code=500, detail=f"Error inesperado: {str(e)}")
 
 @router.get("/")
-def listar_facturas(skip: int = 0, limit: int = 10, request: Request = None):
-    logger.info(f"Solicitud GET {request.url.path} skip={skip} limit={limit}")
+def listar_facturas(skip: int = 0, limit: int = 10, usuario_id: int = None, request: Request = None):
+    logger.info(f"Solicitud GET {request.url.path} skip={skip} limit={limit} usuario_id={usuario_id}")
     try:
-        facturas = obtener_facturas(skip=skip, limit=limit)
+        facturas = obtener_facturas(skip=skip, limit=limit, usuario_id=usuario_id)
         if isinstance(facturas, dict) and "error" in facturas:
             logger.error(f"Error al obtener facturas: {facturas['error']}")
             raise HTTPException(status_code=500, detail=facturas["error"])
