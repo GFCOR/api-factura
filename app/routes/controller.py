@@ -10,37 +10,33 @@ from .models.services.factura_service import (
     obtener_datos_producto,
 )
 
-router = APIRouter(tags=["factura"])
+router = APIRouter()
 
 @router.post("/")
 def crear_nueva_factura(compra: Compra):
-    # Obtener datos del usuario
+    print("Recibido:", compra)
     datos_usuario = obtener_datos_usuario(compra.usuario_id)
+    print("Datos usuario:", datos_usuario)
     if "error" in datos_usuario:
         raise HTTPException(status_code=500, detail=datos_usuario["error"])
 
-    # Obtener datos de los productos y calcular subtotales
     productos_detalles = []
     for producto in compra.productos:
         producto_detalle = obtener_datos_producto(producto["id"])
+        print("Producto detalle:", producto_detalle)
         if "error" in producto_detalle:
             raise HTTPException(status_code=500, detail=producto_detalle["error"])
-
-        # Calcular subtotal para el producto
         subtotal = producto_detalle["precio"] * producto["cantidad"]
         productos_detalles.append({
             "id_producto": producto_detalle["id_producto"],
             "nombre": producto_detalle["nombre"],
-            "descripcion": producto_detalle["descripcion"],
+            "descripcion": producto_detalle["descripcion", ""],
             "precio_unitario": producto_detalle["precio"],
             "cantidad": producto["cantidad"],
             "subtotal": subtotal
         })
 
-    # Calcular el total general de la factura
     total = sum(item["subtotal"] for item in productos_detalles)
-
-    # Crear la factura final
     factura_dict = {
         "usuario_id": compra.usuario_id,
         "datos_usuario": datos_usuario,
@@ -48,9 +44,9 @@ def crear_nueva_factura(compra: Compra):
         "total": total,
         "fecha": compra.fecha
     }
-
-    # Guardar la factura en la base de datos
+    print("Factura dict:", factura_dict)
     factura_id = crear_factura(factura_dict)
+    print("Factura id:", factura_id)
     if "error" in factura_id:
         raise HTTPException(status_code=500, detail=factura_id["error"])
 
