@@ -28,10 +28,10 @@ def crear_nueva_factura(compra: Compra):
             raise HTTPException(status_code=500, detail=producto_detalle["error"])
         subtotal = producto_detalle["precio"] * producto["cantidad"]
         productos_detalles.append({
-            "id_producto": producto_detalle["id_producto"],
-            "nombre": producto_detalle["nombre"],
-            "descripcion": producto_detalle["descripcion", ""],
-            "precio_unitario": producto_detalle["precio"],
+            "id_producto": producto_detalle.get("id_producto"),
+            "nombre": producto_detalle.get("nombre"),
+            "descripcion": producto_detalle.get("descripcion", ""),  # <-- aquí el cambio
+            "precio_unitario": producto_detalle.get("precio"),
             "cantidad": producto["cantidad"],
             "subtotal": subtotal
         })
