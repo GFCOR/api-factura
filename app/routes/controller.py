@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Request
-from .models.services.utils.validation import Compra
+from .models.services.utils.models import Compra
 from .models.services.factura_service import (
     crear_factura,
     obtener_facturas,
@@ -24,7 +24,8 @@ def crear_nueva_factura(compra: Compra, request: Request):
             logger.error(f"Error usuario: {datos_usuario['error']}")
             raise HTTPException(status_code=400, detail=datos_usuario["error"])
 
-        productos_detalles = []
+        productos_obj = []
+        total = 0.0
         for producto in compra.productos:
             producto_detalle = obtener_datos_producto(producto.id)
             logger.info(f"Producto detalle: {producto_detalle}")
@@ -35,22 +36,26 @@ def crear_nueva_factura(compra: Compra, request: Request):
                 logger.error(f"Producto sin precio: {producto_detalle}")
                 raise HTTPException(status_code=422, detail="El producto no tiene precio")
             subtotal = producto_detalle["precio"] * producto.cantidad
-            productos_detalles.append({
-                "id_producto": producto_detalle.get("id_producto"),
-                "nombre": producto_detalle.get("nombre"),
-                "descripcion": producto_detalle.get("descripcion", ""),
+            total += subtotal
+            productos_obj.append({
+                "id_prod": producto_detalle.get("id_producto", producto.id),
                 "precio_unitario": producto_detalle.get("precio"),
                 "cantidad": producto.cantidad,
                 "subtotal": subtotal
             })
 
-        total = sum(item["subtotal"] for item in productos_detalles)
+        usuario_info = {
+            "nombre": datos_usuario.get("name", ""),
+            "apellido": datos_usuario.get("apellido", ""),
+            "correo": datos_usuario.get("mail", "")
+        }
+
         factura_dict = {
             "usuario_id": compra.usuario_id,
-            "datos_usuario": datos_usuario,
-            "productos": productos_detalles,
+            "productos": productos_obj,
             "total": total,
-            "fecha": compra.fecha
+            "fecha": compra.fecha,
+            "usuario_info": usuario_info
         }
         logger.info(f"Factura dict: {factura_dict}")
         factura_id = crear_factura(factura_dict)
@@ -65,6 +70,7 @@ def crear_nueva_factura(compra: Compra, request: Request):
     except Exception as e:
         logger.exception("Error inesperado al crear factura")
         raise HTTPException(status_code=500, detail=f"Error inesperado: {str(e)}")
+    
 
 @router.get("/")
 def listar_facturas(skip: int = 0, limit: int = 10, usuario_id: int = None, request: Request = None):
