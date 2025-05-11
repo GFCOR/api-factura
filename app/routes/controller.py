@@ -34,7 +34,7 @@ def crear_nueva_factura(compra: Compra, request: Request):
             if "precio" not in producto_detalle:
                 logger.error(f"Producto sin precio: {producto_detalle}")
                 raise HTTPException(status_code=422, detail="El producto no tiene precio")
-            subtotal = producto_detalle["precio"] * producto["cantidad"]
+            subtotal = producto_detalle["precio"] * producto.cantidad
             productos_detalles.append({
                 "id_producto": producto_detalle.get("id_producto"),
                 "nombre": producto_detalle.get("nombre"),
