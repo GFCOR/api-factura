@@ -26,7 +26,7 @@ def crear_nueva_factura(compra: Compra, request: Request):
 
         productos_detalles = []
         for producto in compra.productos:
-            producto_detalle = obtener_datos_producto(producto["id"])
+            producto_detalle = obtener_datos_producto(producto.id)
             logger.info(f"Producto detalle: {producto_detalle}")
             if "error" in producto_detalle:
                 logger.error(f"Error producto: {producto_detalle['error']}")
@@ -40,7 +40,7 @@ def crear_nueva_factura(compra: Compra, request: Request):
                 "nombre": producto_detalle.get("nombre"),
                 "descripcion": producto_detalle.get("descripcion", ""),
                 "precio_unitario": producto_detalle.get("precio"),
-                "cantidad": producto["cantidad"],
+                "cantidad": producto.cantidad,
                 "subtotal": subtotal
             })
 
