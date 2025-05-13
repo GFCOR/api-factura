@@ -12,6 +12,16 @@ API_PRODUCTOS_URL = "http://api-productos:8001/productos/{id}"
 
 logger = logging.getLogger("factura_service")
 
+def crear_factura(factura_data):
+    try:
+        nueva_factura = facturas_collection.insert_one(factura_data)
+        logger.info(f"Factura insertada con _id: {nueva_factura.inserted_id}")
+        return str(nueva_factura.inserted_id)
+    except Exception as e:
+        logger.exception("No se pudo crear la factura")
+        return {"error": f"No se pudo crear la factura: {str(e)}"}
+
+
 def obtener_datos_usuario(usuario_id: int):
     try:
         with httpx.Client() as client:
@@ -41,15 +51,6 @@ def obtener_datos_producto(producto_id: int):
     except Exception as e:
         logger.exception("Error inesperado al consultar la API de productos")
         return {"error": f"Error inesperado al consultar la API de productos: {str(e)}"}
-
-def crear_factura(factura_data):
-    try:
-        nueva_factura = facturas_collection.insert_one(factura_data)
-        logger.info(f"Factura insertada con _id: {nueva_factura.inserted_id}")
-        return str(nueva_factura.inserted_id)
-    except Exception as e:
-        logger.exception("No se pudo crear la factura")
-        return {"error": f"No se pudo crear la factura: {str(e)}"}
 
 def obtener_facturas(skip=0, limit=10, usuario_id=None):
     try:
